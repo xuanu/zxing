@@ -3,6 +3,7 @@ package cn.zeffect.qr_zxing;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,11 +48,16 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback,
     private DecodeThread mDecodeThread;
     private Rect previewFrameRect = null;
     private boolean isDecoding = false;
-
+    private Button backBtn, gallaryBtn;
+    private CheckBox flashCb;
+    private static final int COLOR_DEFAULT = Color.parseColor("#dd5e99e7");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qr_zxing_activity_capture);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.getWindow().setStatusBarColor(COLOR_DEFAULT);
+        }
         previewSv = (SurfaceView) findViewById(R.id.sv_preview);
         captureView = (CaptureView) findViewById(R.id.cv_capture);
         captureView.setOnTouchListener(new View.OnTouchListener() {
@@ -65,9 +71,51 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback,
         mCameraManager = new CameraManager(this);
         mCameraManager.setPreviewFrameShotListener(this);
         //
-
+        initView();
         //
     }
+
+    private void initView(){
+        //返回
+        backBtn = (Button) findViewById(R.id.qr_zxing_back_btn);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setResult(RESULT_CANCELED);
+                CaptureActivity.this.finish();
+            }
+        });
+        //灯光
+        flashCb = (CheckBox) findViewById(R.id.qr_zxing_flast_cb);
+        flashCb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (flashCb.isChecked()) {
+                    mCameraManager.enableFlashlight();
+                } else {
+                    mCameraManager.disableFlashlight();
+                }
+            }
+        });
+        //相册
+        gallaryBtn = (Button) findViewById(R.id.qr_zxing_gallary_btn);
+        gallaryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = null;
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                    intent = new Intent(Intent.ACTION_GET_CONTENT);
+                } else {
+                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                }
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                intent.putExtra("return-data", true);
+                startActivityForResult(intent, REQUEST_CODE_ALBUM);
+            }
+        });
+    }
+
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -178,7 +226,8 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback,
                 String path = DocumentUtil.getPath(CaptureActivity.this, data.getData());
                 cameraBitmap = DocumentUtil.getBitmap(path);
             } else {
-                // Not supported in SDK lower that KitKat
+                String path = DocumentUtil.getPath4(CaptureActivity.this, data.getData());
+                cameraBitmap = DocumentUtil.getBitmap(path);
             }
             if (cameraBitmap != null) {
                 if (mDecodeThread != null) {

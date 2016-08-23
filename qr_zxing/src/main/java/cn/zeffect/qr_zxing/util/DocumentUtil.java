@@ -47,6 +47,22 @@ public class DocumentUtil {
 		return null;
 	}
 
+	public static String getPath4(final Context context, final Uri uri) {
+		String localPath = "";
+		Cursor cr = context.getContentResolver().query(uri,
+				new String[]{MediaStore.Images.Media.DATA}, null,
+				null, null);
+		if (cr == null) {
+			return "";
+		}
+		if (cr.moveToFirst()) {
+			localPath = cr.getString(cr
+					.getColumnIndex(MediaStore.Images.Media.DATA));
+		}
+		cr.close();
+		return localPath;
+	}
+
 	public static String getPath(final Context context, final Uri uri) {
 		final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 		if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
