@@ -33,4 +33,4 @@ dependencies {
 
 
 截图：
-![image](https://github.com/xuanu/zxing/screenshot/Screenshot_20160823-142056.png)
+![image](https://github.com/xuanu/zxing/raw/master/screenshot/Screenshot_20160823-142056.png)
