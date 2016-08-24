@@ -17,7 +17,7 @@ import cn.zeffect.qr_zxing.CaptureActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button  zxing;
+    Button zxing;
     TextView result;
 
     @Override
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         zxing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(MainActivity.this, new String[]{Manifest.permission.CAMERA}, new PermissionsResultAction() {
+                PermissionsManager.getInstance().requestPermissionsIfNecessaryForResult(MainActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionsResultAction() {
                     @Override
                     public void onGranted() {
                         startActivityForResult(new Intent(MainActivity.this, cn.zeffect.qr_zxing.CaptureActivity.class), 100);

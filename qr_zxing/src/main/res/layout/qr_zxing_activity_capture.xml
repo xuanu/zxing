@@ -27,7 +27,7 @@
         android:id="@+id/qr_title_rl"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="#ee5c99e9"
+        android:background="#ee2d2e33"
         >
 
         <Button

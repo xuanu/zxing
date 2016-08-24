@@ -50,14 +50,11 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback,
     private boolean isDecoding = false;
     private Button backBtn, gallaryBtn;
     private CheckBox flashCb;
-    private static final int COLOR_DEFAULT = Color.parseColor("#dd5e99e7");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.qr_zxing_activity_capture);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            this.getWindow().setStatusBarColor(COLOR_DEFAULT);
-        }
         previewSv = (SurfaceView) findViewById(R.id.sv_preview);
         captureView = (CaptureView) findViewById(R.id.cv_capture);
         captureView.setOnTouchListener(new View.OnTouchListener() {
@@ -75,7 +72,7 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback,
         //
     }
 
-    private void initView(){
+    private void initView() {
         //返回
         backBtn = (Button) findViewById(R.id.qr_zxing_back_btn);
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -102,20 +99,22 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback,
         gallaryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = null;
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                    intent = new Intent(Intent.ACTION_GET_CONTENT);
-                } else {
-                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                }
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("image/*");
-                intent.putExtra("return-data", true);
-                startActivityForResult(intent, REQUEST_CODE_ALBUM);
+                choseImageFromGallery();
             }
         });
     }
 
+
+    /**
+     * 从本地相册?取图片作为头像
+     */
+    private void choseImageFromGallery() {
+        Intent intentFromGallery = new Intent();
+        // 设置文件类型
+        intentFromGallery.setType("image/*");
+        intentFromGallery.setAction(Intent.ACTION_PICK);
+        startActivityForResult(intentFromGallery, REQUEST_CODE_ALBUM);
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -222,13 +221,13 @@ public class CaptureActivity extends Activity implements SurfaceHolder.Callback,
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_ALBUM && resultCode == RESULT_OK && data != null) {
             Bitmap cameraBitmap = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                String path = DocumentUtil.getPath(CaptureActivity.this, data.getData());
-                cameraBitmap = DocumentUtil.getBitmap(path);
-            } else {
-                String path = DocumentUtil.getPath4(CaptureActivity.this, data.getData());
-                cameraBitmap = DocumentUtil.getBitmap(path);
-            }
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                String path = DocumentUtil.getPath(CaptureActivity.this, data.getData());
+//                cameraBitmap = DocumentUtil.getBitmap(path);
+//            } else {
+            String path = DocumentUtil.getPath4(CaptureActivity.this, data.getData());
+            cameraBitmap = DocumentUtil.getBitmap(path);
+//            }
             if (cameraBitmap != null) {
                 if (mDecodeThread != null) {
                     mDecodeThread.cancel();
